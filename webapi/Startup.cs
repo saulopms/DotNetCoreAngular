@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using webapi.Data;
+using repository;
 
 namespace webapi
 {
@@ -28,9 +28,10 @@ namespace webapi
         public void ConfigureServices(IServiceCollection services)
         {
             
-            services.AddDbContext<DataContext>(x => x.UseSqlite(
+            services.AddDbContext<repository.DataContext>(x => x.UseSqlite(
                 Configuration.GetConnectionString("DefaultConnection")
             ));
+            services.AddScoped<IRepository,Repository>();
             services.AddControllers();
             services.AddCors();
         }
@@ -46,7 +47,7 @@ namespace webapi
             //app.UseHttpsRedirection();
             app.UseCors(x => x.AllowAnyOrigin(                
                ).AllowAnyMethod().AllowAnyHeader());
-
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
