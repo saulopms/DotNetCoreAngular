@@ -103,7 +103,7 @@ namespace webapi.Controllers
         } 
 
 
-        [HttpPut]
+        [HttpPut("{EventoId:int}")]
         public async Task<IActionResult> Put(int EventoId,
         Evento model)
         {
@@ -112,16 +112,12 @@ namespace webapi.Controllers
                var evento = await 
                   _repo.GetEventoAsyncById(EventoId, false);
 
-                if(evento == null)
-                  return NotFound();
-
+                if(evento == null) return NotFound();
 
                 _repo.Update(model); 
 
                 if(await _repo.SaveChangesAsync())                
                   return Created($"/evento/{model.Id}",model);
-                 // return Ok(results);
-
 
            }
            catch(System.Exception)
@@ -129,14 +125,13 @@ namespace webapi.Controllers
                 return this.StatusCode(
                     StatusCodes.Status500InternalServerError,
                     "Banco de dados falhou");
-
            }
 
            return BadRequest();
         }  
 
 
-        [HttpDelete]
+        [HttpDelete("{EventoId:int}")]
         public async Task<IActionResult> Delete(int EventoId)
         {
            try{

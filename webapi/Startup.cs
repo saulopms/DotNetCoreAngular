@@ -31,8 +31,10 @@ namespace webapi
             services.AddDbContext<repository.DataContext>(x => x.UseSqlite(
                 Configuration.GetConnectionString("DefaultConnection")
             ));
+            
             services.AddScoped<IRepository,Repository>();
             services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddCors();
         }
 
