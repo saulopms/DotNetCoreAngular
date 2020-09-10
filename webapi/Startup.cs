@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using repository;
+
 
 namespace webapi
 {
@@ -33,6 +35,7 @@ namespace webapi
             ));
             
             services.AddScoped<IRepository,Repository>();
+            services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
             services.AddControllers().AddNewtonsoftJson();
             services.AddCors();

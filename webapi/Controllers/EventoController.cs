@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using repository;
 using webapi;
+using webapi.Dtos;
 
 namespace webapi.Controllers
 {
@@ -17,10 +19,13 @@ namespace webapi.Controllers
     public class EventoController : ControllerBase
     {
         private readonly IRepository _repo;
+        private readonly IMapper _mapper;
 
-        public EventoController(IRepository repo)
+        public EventoController(IRepository repo, IMapper mapper)
         {
-            this._repo = repo;
+            _mapper = mapper;
+            _repo = repo;
+            
         }
       
 
@@ -28,8 +33,9 @@ namespace webapi.Controllers
         public async Task<IActionResult> Get()
         {
            try{
-               var results = await 
+               var eventos = await 
                   _repo.GetAllEventoAsync(true); 
+               var results = _mapper.Map<IEnumerable<EventoDto>>(eventos);
                return Ok(results);
 
            }
@@ -46,8 +52,9 @@ namespace webapi.Controllers
         public async Task<IActionResult> Get(int EventoId)
         {
            try{
-               var results = await 
-                  _repo.GetEventoAsyncById(EventoId,true); 
+               var evento = await 
+                  _repo.GetEventoAsyncById(EventoId,true);
+               var results = _mapper.Map<EventoDto>(evento); 
                return Ok(results);
 
            }
@@ -64,9 +71,10 @@ namespace webapi.Controllers
         public async Task<IActionResult> Get(string tema)
         {
            try{
-               var results = await 
+               var eventos = await 
                   _repo.GetAllEventoAsyncByTema(tema,
                   true); 
+               var results = _mapper.Map<IEnumerable<EventoDto>>(eventos);
                return Ok(results);
 
            }
@@ -80,13 +88,15 @@ namespace webapi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(Evento model)
+        public async Task<IActionResult> Post(EventoDto model)
         {
            try{
-                _repo.Add(model); 
+                var evento = _mapper.Map<Evento>(model);
+                _repo.Add(evento); 
 
                 if(await _repo.SaveChangesAsync())                
-                  return Created($"/evento/{model.Id}",model);
+                  return Created($"/evento/{model.Id}",
+                  _mapper.Map<EventoDto>(evento));
                  // return Ok(results);
 
 
@@ -114,10 +124,13 @@ namespace webapi.Controllers
 
                 if(evento == null) return NotFound();
 
+                _mapper.Map(model, evento);
+
                 _repo.Update(model); 
 
                 if(await _repo.SaveChangesAsync())                
-                  return Created($"/evento/{model.Id}",model);
+                  return Created($"/evento/{model.Id}",
+                  _mapper.Map<EventoDto>(evento));
 
            }
            catch(System.Exception)
